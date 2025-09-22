@@ -166,6 +166,9 @@ jspm_packages/
 tmp/
 temp/
 
+# Local development SSL certificates (do not commit)
+/client/ssl/
+
 ## IDEs and Editors
 .vscode/*
 !.vscode/settings.json
@@ -226,6 +229,9 @@ $RECYCLE.BIN/
 ## Logs
 logs
 *.log
+
+# Local development configuration (contains secrets)
+API/appsettings.Development.json
 
 ## Miscellaneous
 /.angular/cache
