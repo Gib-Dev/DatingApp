@@ -56,7 +56,8 @@ bld/
 *.scc
 
 # Entity Framework
-Migrations/
+# Keep migrations tracked
+# (Do not ignore the Migrations folder so schema history is committed)
 
 # NuGet
 *.nupkg
@@ -154,7 +155,8 @@ jspm_packages/
 
 # Gatsby files
 .cache/
-public
+# Keep public assets tracked in Angular client
+!/client/public/
 
 # Storybook build outputs
 .out
