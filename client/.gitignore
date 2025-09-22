@@ -7,8 +7,8 @@
 /bazel-out
 
 # Angular cache
-/.angular/cache
 .angular/
+.angular/cache/
 
 # Node modules
 /node_modules

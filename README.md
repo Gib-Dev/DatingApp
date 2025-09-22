@@ -75,6 +75,10 @@ DatingApp/
 - .NET 9 SDK
 - Node.js (v18 or higher)
 - Angular CLI (v21)
+- EF Core CLI tool (for migrations):
+  ```bash
+  dotnet tool install --global dotnet-ef
+  ```
 
 ### Backend Setup
 
@@ -98,7 +102,7 @@ DatingApp/
    dotnet run
    ```
 
-The API will be available at `https://localhost:5001`
+The API will be available at `https://localhost:5001`.
 
 ### Frontend Setup
 
@@ -117,7 +121,7 @@ The API will be available at `https://localhost:5001`
    npm start
    ```
 
-The application will be available at `https://localhost:4200`
+The application will be available at `https://localhost:4200`.
 
 ## API Endpoints
 
@@ -163,3 +167,67 @@ The application will be available at `https://localhost:4200`
 ## License
 
 This project is for educational purposes.
+
+## Demo
+
+- Live demo: add link here when deployed
+- API base URL (local): `https://localhost:5001`
+- Client URL (local): `https://localhost:4200`
+
+## Screenshots
+
+Place screenshots in `client/public/` and reference them here:
+
+- Landing page: `client/public/landing.png`
+- Members list: `client/public/members.png`
+- Messaging: `client/public/messages.png`
+
+## Environment Configuration
+
+- Backend (`API/appsettings.Development.json`): set connection strings and JWT config.
+- Frontend (`client/src/app`): update API base URL used by the HTTP client if applicable.
+- Secrets: never commit real secrets. Use user secrets or environment variables for production.
+
+## Development Workflow
+
+1. Start API: `cd API && dotnet run`
+2. Start Client: `cd client && npm start`
+3. Browse client at `https://localhost:4200` (API must be running for data).
+
+### Common Tasks
+
+- Run Angular unit tests: `cd client && npm test`
+- Add EF Core migration: `cd API && dotnet ef migrations add <Name>`
+- Update database: `cd API && dotnet ef database update`
+
+## Deployment
+
+### API (Azure App Service)
+
+- Publish profile from Visual Studio or `dotnet publish -c Release` and deploy artifact.
+- Set environment variables (e.g., connection strings, JWT options) in Azure.
+
+### Client (Static Hosting)
+
+- Build: `cd client && npm run build` (outputs to `client/dist`).
+- Deploy `dist` output to a static host (Azure Static Web Apps, Netlify, Vercel, S3+CloudFront).
+- Ensure the client points to the public API URL.
+
+## Roadmap
+
+- Photo upload and gallery
+- Private messaging
+- Filtering, sorting, and paging
+- JWT authentication and guards
+- Real-time presence and notifications with SignalR
+
+## How to Use This in a Portfolio
+
+- Summarize the problem: modern full-stack app with auth, data, and realtime.
+- Highlight your role: API design, Angular UI, security, and deployment.
+- Link to the live demo and include 2–3 screenshots.
+- Brief bullet points of technical highlights (see Roadmap and Technologies Used).
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
