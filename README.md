@@ -24,7 +24,7 @@ This is a modern dating application featuring user registration, authentication,
 
 ### Backend Features
 - User registration with email validation
-- User login with secure password authentication
+- User log in with secure password authentication
 - Member listing and individual member retrieval
 - SQLite database with Entity Framework Core migrations
 - CORS configuration for frontend integration
@@ -49,7 +49,7 @@ DatingApp/
 │   │   ├── LoginDto.cs           # Login data transfer object
 │   │   └── Migrations/           # Database migrations
 │   ├── DTOs/                     # Data transfer objects
-│   │   └── RegistrerDto.cs       # Registration DTO
+│   │   └── RegistrerDto.cs       # Registration DTO (filename may be corrected to RegisterDto.cs)
 │   ├── Entities/                 # Domain entities
 │   │   └── AppUser.cs            # User entity
 │   ├── dating.db                 # SQLite database
@@ -127,7 +127,7 @@ The application will be available at `https://localhost:4200`.
 
 ### Authentication
 - `POST /api/account/register` - Register a new user
-- `POST /api/account/login` - Login user
+- `POST /api/account/login` - Log in user
 
 ### Members
 - `GET /api/members` - Get all members
@@ -144,11 +144,20 @@ The application will be available at `https://localhost:4200`.
 
 ## Development Notes
 
-- The application uses SQLite for development database
+- The application uses SQLite for the development database
 - Password hashing is implemented using HMACSHA512
 - CORS is configured to allow requests from Angular development server
 - The frontend uses Tailwind CSS with DaisyUI for styling
 - SSL certificates are included for HTTPS development
+
+## Security Notes
+
+- Secrets: never commit real secrets. Keep `appsettings.Development.json` local; use `appsettings.Development.example.json` as a template.
+- JWT signing key: store securely via environment variables or a secrets provider in production.
+- Password hashing: for production, prefer PBKDF2, bcrypt, scrypt, or Argon2 instead of raw HMACSHA512.
+- CORS: restrict origins, headers, and methods in production.
+- HTTPS: enforce HTTPS redirection and enable HSTS in production.
+- Rate limiting: apply on authentication endpoints to mitigate brute-force attacks.
 
 ## Technologies Used
 
@@ -200,6 +209,11 @@ Place screenshots in `client/public/` and reference them here:
 - Add EF Core migration: `cd API && dotnet ef migrations add <Name>`
 - Update database: `cd API && dotnet ef database update`
 
+## Testing
+
+- Backend: add unit tests for services (e.g., token issuance) and controller actions; consider integration tests against a test database.
+- Frontend: run unit tests with `npm test` and consider end-to-end tests for critical flows.
+
 ## Deployment
 
 ### API (Azure App Service)
@@ -212,6 +226,11 @@ Place screenshots in `client/public/` and reference them here:
 - Build: `cd client && npm run build` (outputs to `client/dist`).
 - Deploy `dist` output to a static host (Azure Static Web Apps, Netlify, Vercel, S3+CloudFront).
 - Ensure the client points to the public API URL.
+
+## Configuration and Environments
+
+- Backend configuration lives in `API/appsettings*.json`. Use environment variables or managed secrets in production.
+- Frontend should reference the API base URL from environment configuration and avoid hardcoding URLs.
 
 ## Roadmap
 
