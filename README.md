@@ -9,12 +9,14 @@ This is a modern dating application featuring user registration, authentication,
 ## Architecture
 
 ### Backend (.NET 9 Web API)
+
 - **Framework**: .NET 9.0
 - **Database**: SQLite with Entity Framework Core
 - **Authentication**: Custom password hashing with HMACSHA512
 - **CORS**: Configured for Angular development server
 
 ### Frontend (Angular 21)
+
 - **Framework**: Angular 21 (next version)
 - **Styling**: Tailwind CSS with DaisyUI components
 - **Build Tool**: Angular CLI with zoneless change detection
@@ -23,6 +25,7 @@ This is a modern dating application featuring user registration, authentication,
 ## Features
 
 ### Backend Features
+
 - User registration with email validation
 - User log in with secure password authentication
 - Member listing and individual member retrieval
@@ -30,6 +33,7 @@ This is a modern dating application featuring user registration, authentication,
 - CORS configuration for frontend integration
 
 ### Frontend Features
+
 - Modern UI with Tailwind CSS and DaisyUI
 - Member listing display
 - Responsive design
@@ -72,6 +76,7 @@ DatingApp/
 ## Getting Started
 
 ### Prerequisites
+
 - .NET 9 SDK
 - Node.js (v18 or higher)
 - Angular CLI (v21)
@@ -83,16 +88,19 @@ DatingApp/
 ### Backend Setup
 
 1. Navigate to the API directory:
+
    ```bash
    cd API
    ```
 
 2. Restore dependencies:
+
    ```bash
    dotnet restore
    ```
 
 3. Update the database:
+
    ```bash
    dotnet ef database update
    ```
@@ -107,11 +115,13 @@ The API will be available at `https://localhost:5001`.
 ### Frontend Setup
 
 1. Navigate to the client directory:
+
    ```bash
    cd client
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
@@ -126,16 +136,19 @@ The application will be available at `https://localhost:4200`.
 ## API Endpoints
 
 ### Authentication
+
 - `POST /api/account/register` - Register a new user
 - `POST /api/account/login` - Log in user
 
 ### Members
+
 - `GET /api/members` - Get all members
 - `GET /api/members/{id}` - Get member by ID
 
 ## Database Schema
 
 ### AppUser Entity
+
 - `Id` (string) - Unique identifier
 - `DisplayName` (string) - User's display name
 - `Email` (string) - User's email address
@@ -162,12 +175,14 @@ The application will be available at `https://localhost:4200`.
 ## Technologies Used
 
 ### Backend
+
 - .NET 9.0
 - Entity Framework Core 9.0.8
 - SQLite
 - ASP.NET Core Web API
 
 ### Frontend
+
 - Angular 21.0.0-next.0
 - Tailwind CSS 4.1.12
 - DaisyUI 5.0.54
@@ -239,13 +254,6 @@ Place screenshots in `client/public/` and reference them here:
 - Filtering, sorting, and paging
 - JWT authentication and guards
 - Real-time presence and notifications with SignalR
-
-## How to Use This in a Portfolio
-
-- Summarize the problem: modern full-stack app with auth, data, and realtime.
-- Highlight your role: API design, Angular UI, security, and deployment.
-- Link to the live demo and include 2–3 screenshots.
-- Brief bullet points of technical highlights (see Roadmap and Technologies Used).
 
 ## License
 
