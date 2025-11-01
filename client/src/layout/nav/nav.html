@@ -21,9 +21,11 @@
         <h3 class="text-2xl font-semibold uppercase">Dating App</h3>
       </a>
       <nav class="flex gap-6 uppercase text-lg text-white">
+        @if (accountService.currentUser()) {
         <a routerLink="/members" routerLinkActive="text-accent">Matches</a>
         <a routerLink="/lists" routerLinkActive="text-accent">Lists</a>
         <a routerLink="/messages" routerLinkActive="text-accent">Messages</a>
+        }
       </nav>
     </div>
 
