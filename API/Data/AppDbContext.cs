@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using API.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,12 @@ namespace API.Data;
 public class AppDbContext(DbContextOptions options) : DbContext(options)
 {
     public DbSet<AppUser> Users { get; set; }
+    public DbSet<Member> Members { get; set; }
+    public DbSet<Photo> Photos { get; set; }
+
+    //Nav Property
+
+    public Member User { get; set; } = null!;
 }
 
 
