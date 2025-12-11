@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using API.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,5 +11,3 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
     public DbSet<Member> Members { get; set; }
     public DbSet<Photo> Photos { get; set; }
 }
-
-
