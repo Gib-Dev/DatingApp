@@ -19,6 +19,7 @@ export class MemberList implements OnInit, OnDestroy {
   loading = signal(false);
   error = signal<string | null>(null);
   likingMemberId = signal<string | null>(null);
+  likedMemberIds = signal<Set<string>>(new Set());
 
   private memberService = inject(MemberService);
   private likesService = inject(LikesService);
@@ -27,6 +28,21 @@ export class MemberList implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadMembers();
+    this.loadLikedMembers();
+  }
+
+  private loadLikedMembers(): void {
+    this.likesService.getLikes('liked')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (likedMembers) => {
+          const likedIds = new Set(likedMembers.map(m => m.id));
+          this.likedMemberIds.set(likedIds);
+        },
+        error: (err) => {
+          console.error('Error loading liked members:', err);
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -62,8 +78,17 @@ export class MemberList implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
+          // Update local state
+          const currentLikes = new Set(this.likedMemberIds());
+          if (currentLikes.has(memberId)) {
+            currentLikes.delete(memberId);
+            this.toastService.success('Like removed!');
+          } else {
+            currentLikes.add(memberId);
+            this.toastService.success('Member liked!');
+          }
+          this.likedMemberIds.set(currentLikes);
           this.likingMemberId.set(null);
-          this.toastService.success('Like updated!');
         },
         error: (err) => {
           this.likingMemberId.set(null);
@@ -71,5 +96,9 @@ export class MemberList implements OnInit, OnDestroy {
           console.error('Error toggling like:', err);
         }
       });
+  }
+
+  isLiked(memberId: string): boolean {
+    return this.likedMemberIds().has(memberId);
   }
 }

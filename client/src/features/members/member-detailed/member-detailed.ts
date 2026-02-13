@@ -19,6 +19,7 @@ export class MemberDetailed implements OnInit, OnDestroy {
   loading = signal(false);
   error = signal<string | null>(null);
   liking = signal(false);
+  isLiked = signal(false);
 
   private memberService = inject(MemberService);
   private likesService = inject(LikesService);
@@ -31,9 +32,23 @@ export class MemberDetailed implements OnInit, OnDestroy {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loadMember(id);
+      this.checkIfLiked(id);
     } else {
       this.router.navigate(['/members']);
     }
+  }
+
+  private checkIfLiked(memberId: string): void {
+    this.likesService.getLikes('liked')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (likedMembers) => {
+          this.isLiked.set(likedMembers.some(m => m.id === memberId));
+        },
+        error: (err) => {
+          console.error('Error checking liked status:', err);
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -88,8 +103,11 @@ export class MemberDetailed implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
+          // Toggle local state
+          const currentlyLiked = this.isLiked();
+          this.isLiked.set(!currentlyLiked);
           this.liking.set(false);
-          this.toastService.success('Like updated!');
+          this.toastService.success(currentlyLiked ? 'Like removed!' : 'Member liked!');
         },
         error: (err) => {
           this.liking.set(false);

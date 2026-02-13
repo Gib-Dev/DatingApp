@@ -87,7 +87,6 @@ public class LikesController(AppDbContext context) : BaseApiController
         }
 
         var members = await query
-            .Include(m => m.Photos)
             .Select(m => new MemberDto
             {
                 Id = m.Id,
