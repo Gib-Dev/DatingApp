@@ -1,1 +1,139 @@
-<p>member-detailed works!</p>
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-4">
+    <a routerLink="/members" class="btn btn-ghost btn-sm">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Back to Members
+    </a>
+  </div>
+
+  @if (loading()) {
+    <div class="flex justify-center items-center py-20">
+      <span class="loading loading-spinner loading-lg"></span>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  @if (member(); as m) {
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Left Column - Photos -->
+      <div class="lg:col-span-1">
+        <div class="card bg-base-100 shadow-xl">
+          <figure>
+            <img
+              [src]="m.imageUrl || 'https://via.placeholder.com/400'"
+              [alt]="m.displayName"
+              class="w-full object-cover aspect-square"
+            />
+          </figure>
+          <div class="card-body">
+            <h2 class="card-title text-2xl">{{ m.displayName }}</h2>
+
+            <div class="divider my-2"></div>
+
+            <div class="space-y-2">
+              <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span>{{ m.city }}, {{ m.country }}</span>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span>{{ calculateAge(m.dateOfBirth) }} years old</span>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span class="capitalize">{{ m.gender }}</span>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="text-sm opacity-70">Last active: {{ formatDate(m.lastActive) }}</span>
+              </div>
+            </div>
+
+            <div class="divider my-2"></div>
+
+            <div class="card-actions justify-center mt-4">
+              <button class="btn btn-primary btn-block">Send Message</button>
+              <button class="btn btn-secondary btn-block">Like</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Photo Gallery -->
+        @if (m.photos.length > 0) {
+          <div class="card bg-base-100 shadow-xl mt-4">
+            <div class="card-body">
+              <h3 class="card-title">Photos</h3>
+              <div class="grid grid-cols-2 gap-2">
+                @for (photo of m.photos; track photo.id) {
+                  <img
+                    [src]="photo.url"
+                    alt="Photo"
+                    class="rounded-lg object-cover aspect-square cursor-pointer hover:opacity-80 transition-opacity"
+                  />
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Right Column - About -->
+      <div class="lg:col-span-2">
+        <div class="card bg-base-100 shadow-xl">
+          <div class="card-body">
+            <h3 class="card-title text-xl mb-4">About {{ m.displayName }}</h3>
+
+            @if (m.description) {
+              <p class="whitespace-pre-line leading-relaxed">{{ m.description }}</p>
+            } @else {
+              <p class="opacity-60 italic">No description provided</p>
+            }
+
+            <div class="divider"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <h4 class="font-semibold mb-2">Member Info</h4>
+                <div class="space-y-1 text-sm">
+                  <p><span class="opacity-70">Member since:</span> {{ formatDate(m.created) }}</p>
+                  <p><span class="opacity-70">Date of birth:</span> {{ formatDate(m.dateOfBirth) }}</p>
+                  <p><span class="opacity-70">Gender:</span> <span class="capitalize">{{ m.gender }}</span></p>
+                </div>
+              </div>
+
+              <div>
+                <h4 class="font-semibold mb-2">Location</h4>
+                <div class="space-y-1 text-sm">
+                  <p><span class="opacity-70">City:</span> {{ m.city }}</p>
+                  <p><span class="opacity-70">Country:</span> {{ m.country }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
