@@ -1,0 +1,131 @@
+<div class="container mx-auto px-4 py-8 max-w-2xl">
+  <div class="mb-4">
+    <a routerLink="/members" class="btn btn-ghost btn-sm">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Back to Members
+    </a>
+  </div>
+
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title text-2xl mb-4">Edit Your Profile</h2>
+
+      @if (loading()) {
+        <div class="flex justify-center items-center py-10">
+          <span class="loading loading-spinner loading-lg"></span>
+        </div>
+      } @else {
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+          <!-- Description -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-semibold">About You</span>
+              <span class="label-text-alt">
+                {{ form.get('description')?.value?.length || 0 }}/1000
+              </span>
+            </label>
+            <textarea
+              formControlName="description"
+              class="textarea textarea-bordered h-32"
+              placeholder="Tell us about yourself..."
+            ></textarea>
+            @if (form.get('description')?.invalid && form.get('description')?.touched) {
+              <label class="label">
+                <span class="label-text-alt text-error">
+                  @if (form.get('description')?.errors?.['maxlength']) {
+                    Description cannot exceed 1000 characters
+                  }
+                </span>
+              </label>
+            }
+          </div>
+
+          <!-- City -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-semibold">City</span>
+            </label>
+            <input
+              type="text"
+              formControlName="city"
+              class="input input-bordered"
+              placeholder="Enter your city"
+            />
+            @if (form.get('city')?.invalid && form.get('city')?.touched) {
+              <label class="label">
+                <span class="label-text-alt text-error">
+                  @if (form.get('city')?.errors?.['required']) {
+                    City is required
+                  }
+                  @if (form.get('city')?.errors?.['minlength']) {
+                    City must be at least 2 characters
+                  }
+                  @if (form.get('city')?.errors?.['maxlength']) {
+                    City cannot exceed 100 characters
+                  }
+                </span>
+              </label>
+            }
+          </div>
+
+          <!-- Country -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-semibold">Country</span>
+            </label>
+            <input
+              type="text"
+              formControlName="country"
+              class="input input-bordered"
+              placeholder="Enter your country"
+            />
+            @if (form.get('country')?.invalid && form.get('country')?.touched) {
+              <label class="label">
+                <span class="label-text-alt text-error">
+                  @if (form.get('country')?.errors?.['required']) {
+                    Country is required
+                  }
+                  @if (form.get('country')?.errors?.['minlength']) {
+                    Country must be at least 2 characters
+                  }
+                  @if (form.get('country')?.errors?.['maxlength']) {
+                    Country cannot exceed 100 characters
+                  }
+                </span>
+              </label>
+            }
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="divider"></div>
+
+          <div class="flex gap-4">
+            <button
+              type="submit"
+              class="btn btn-primary flex-1"
+              [disabled]="form.invalid || form.pristine || saving()"
+            >
+              @if (saving()) {
+                <span class="loading loading-spinner loading-sm"></span>
+                Saving...
+              } @else {
+                Save Changes
+              }
+            </button>
+
+            <button
+              type="button"
+              (click)="onCancel()"
+              class="btn btn-ghost flex-1"
+              [disabled]="saving()"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      }
+    </div>
+  </div>
+</div>
