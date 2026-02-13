@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using API.Data;
 using API.DTOs;
 using API.Entities;
@@ -9,24 +8,32 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
-public class AccountController(AppDbContext context, ITokenService tokenService) : BaseApiController
+public class AccountController(
+    AppDbContext context,
+    ITokenService tokenService,
+    IPasswordService passwordService) : BaseApiController
 {
     [HttpPost("register")] // POST: api/account/register
-    public async Task<ActionResult<UserDto>> Register(RegistrerDto registrerDto)
+    public async Task<ActionResult<UserDto>> Register(RegisterDto registrerDto)
     {
         if (await EmailExists(registrerDto.Email))
         {
             return BadRequest("Email is already in use");
         }
-        using var hmac = new HMACSHA512();
+
+        passwordService.CreatePasswordHash(
+            registrerDto.Password,
+            out byte[] passwordHash,
+            out byte[] passwordSalt
+        );
 
         var user = new AppUser
         {
-            Id = Guid.NewGuid().ToString(), // or appropriate value/type for Id
+            Id = Guid.NewGuid().ToString(),
             DisplayName = registrerDto.DisplayName,
             Email = registrerDto.Email.ToLower(),
-            PasswordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(registrerDto.Password)),
-            PasswordSalt = hmac.Key
+            PasswordHash = passwordHash,
+            PasswordSalt = passwordSalt
         };
 
         context.Users.Add(user);
@@ -38,17 +45,14 @@ public class AccountController(AppDbContext context, ITokenService tokenService)
     [HttpPost("login")]
     public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
     {
-        var user = await context.Users.SingleOrDefaultAsync(x => x.Email.ToLower() == loginDto.Email.ToLower());
-        if (user == null) return Unauthorized("Invalid email address");
+        var user = await context.Users
+            .SingleOrDefaultAsync(x => x.Email.ToLower() == loginDto.Email.ToLower());
 
-        using var hmac = new HMACSHA512(user.PasswordSalt);
-       
-        var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(loginDto.Password));
+        if (user == null)
+            return Unauthorized("Invalid email address");
 
-        for (var i = 0; i < computedHash.Length; i++)
-        {
-            if (computedHash[i] != user.PasswordHash[i]) return Unauthorized("Invalid password");
-        }
+        if (!passwordService.VerifyPasswordHash(loginDto.Password, user.PasswordHash, user.PasswordSalt))
+            return Unauthorized("Invalid password");
 
         return user.ToDto(tokenService);
     }

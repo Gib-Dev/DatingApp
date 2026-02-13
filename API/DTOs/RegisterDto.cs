@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace API.DTOs;
 
-public class RegistrerDto
+public class RegisterDto
 {
     [Required]
     public string DisplayName { get; set; } = "";   

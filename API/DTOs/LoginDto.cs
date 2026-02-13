@@ -1,6 +1,4 @@
-using System;
-
-namespace API.Data;
+namespace API.DTOs;
 
 public class LoginDto
 {

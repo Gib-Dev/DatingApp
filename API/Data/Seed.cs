@@ -1,15 +1,14 @@
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 using API.DTOs;
 using API.Entities;
+using API.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data;
 
 public class Seed
 {
-    public static async Task SeedUsers(AppDbContext context)
+    public static async Task SeedUsers(AppDbContext context, IPasswordService passwordService)
     {
         if (await context.Users.AnyAsync()) return;
 
@@ -22,18 +21,25 @@ public class Seed
             return;
         }
 
-        using var hmac = new HMACSHA3_512();
+        // Use a consistent password for all seeded users (for development/testing only)
+        const string seedPassword = "Pa$$w0rd";
 
         foreach (var member in members)
         {
+            passwordService.CreatePasswordHash(
+                seedPassword,
+                out byte[] passwordHash,
+                out byte[] passwordSalt
+            );
+
             var user = new AppUser
             {
                 Id = member.Id,
                 Email = member.Email,
                 DisplayName = member.DisplayName,
                 ImageUrl = member.ImageUrl,
-                PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes("Pa$$w0rd")),
-                PasswordSalt = hmac.Key,
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt,
                 Member = new Member
                 {
                     Id = member.Id,
@@ -48,6 +54,8 @@ public class Seed
                     Created = member.Created,
                 }
             };
+
+            context.Users.Add(user);
         }
 
         await context.SaveChangesAsync();

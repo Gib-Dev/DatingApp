@@ -84,6 +84,23 @@ API/dating.db
 *.db-wal
 *.db-journal
 
+# --- AI Assistant / Internal Docs ---
+# Documentation and AI context files (internal use only)
+docs/
+.claude/
+.cursor/
+.aider*
+.windsurf/
+.copilot/
+*.prompt
+*.ai
+*-ai.md
+*-prompt.md
+CLAUDE.md
+PROGRESS.md
+TODO-AI.md
+NOTES-AI.md
+
 # Generated static assets
 **/staticwebassets/**
 
