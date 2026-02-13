@@ -3,15 +3,17 @@ import { inject, Injectable, signal } from '@angular/core';
 import { LoginCreds, RegisterCreds, User } from '../../types/user';
 import { tap } from 'rxjs/internal/operators/tap';
 import { Register } from '../../features/account/register/register';
+import { ENVIRONMENT } from '../tokens/environment.token';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AccountService {
   private http = inject(HttpClient);
+  private env = inject(ENVIRONMENT);
   currentUser = signal<User | null>(null);
 
-  baseUrl = 'https://localhost:5001/api/';
+  private baseUrl = this.env.apiUrl + '/';
 
   Register(creds: RegisterCreds) {
     return this.http.post<User>(this.baseUrl + 'account/register', creds).pipe(

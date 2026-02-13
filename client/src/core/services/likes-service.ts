@@ -2,13 +2,15 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Member } from '../../types/member';
+import { ENVIRONMENT } from '../tokens/environment.token';
 
 @Injectable({
   providedIn: 'root',
 })
 export class LikesService {
   private http = inject(HttpClient);
-  private baseUrl = 'https://localhost:5001/api/';
+  private env = inject(ENVIRONMENT);
+  private baseUrl = this.env.apiUrl + '/';
 
   toggleLike(userId: string): Observable<void> {
     return this.http.post<void>(this.baseUrl + `likes/${userId}`, {});

@@ -2,13 +2,15 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Member, Photo } from '../../types/member';
+import { ENVIRONMENT } from '../tokens/environment.token';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MemberService {
   private http = inject(HttpClient);
-  private baseUrl = 'https://localhost:5001/api/';
+  private env = inject(ENVIRONMENT);
+  private baseUrl = this.env.apiUrl + '/';
 
   getMembers(): Observable<Member[]> {
     return this.http.get<Member[]>(this.baseUrl + 'members');

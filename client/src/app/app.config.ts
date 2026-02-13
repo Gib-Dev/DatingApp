@@ -13,9 +13,12 @@ import { InitService } from '../core/services/init-service';
 import { lastValueFrom } from 'rxjs';
 import { errorInterceptor } from '../core/interceptors/error-interceptor';
 import { authInterceptor } from '../core/interceptors/auth-interceptor';
+import { ENVIRONMENT } from '../core/tokens/environment.token';
+import { environment } from '../environments/environment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    { provide: ENVIRONMENT, useValue: environment },
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(routes, withViewTransitions()),
