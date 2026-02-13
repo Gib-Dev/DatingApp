@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { MemberService } from '../../../core/services/member-service';
+import { LikesService } from '../../../core/services/likes-service';
+import { ToastService } from '../../../core/services/toast-service';
 import { Member } from '../../../types/member';
 
 @Component({
@@ -16,8 +18,11 @@ export class MemberDetailed implements OnInit, OnDestroy {
   member = signal<Member | null>(null);
   loading = signal(false);
   error = signal<string | null>(null);
+  liking = signal(false);
 
   private memberService = inject(MemberService);
+  private likesService = inject(LikesService);
+  private toastService = inject(ToastService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private destroy$ = new Subject<void>();
@@ -72,5 +77,25 @@ export class MemberDetailed implements OnInit, OnDestroy {
       month: 'long',
       day: 'numeric'
     });
+  }
+
+  toggleLike(): void {
+    const memberId = this.member()?.id;
+    if (!memberId) return;
+
+    this.liking.set(true);
+    this.likesService.toggleLike(memberId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.liking.set(false);
+          this.toastService.success('Like updated!');
+        },
+        error: (err) => {
+          this.liking.set(false);
+          this.toastService.error('Failed to update like');
+          console.error('Error toggling like:', err);
+        }
+      });
   }
 }

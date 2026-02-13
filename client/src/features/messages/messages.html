@@ -1,1 +1,114 @@
-<p>messages works!</p>
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-8">Messages</h1>
+
+  <!-- Tabs -->
+  <div role="tablist" class="tabs tabs-boxed mb-8">
+    <a
+      role="tab"
+      class="tab"
+      [class.tab-active]="container() === 'inbox'"
+      (click)="selectContainer('inbox')"
+    >
+      Inbox
+    </a>
+    <a
+      role="tab"
+      class="tab"
+      [class.tab-active]="container() === 'outbox'"
+      (click)="selectContainer('outbox')"
+    >
+      Sent
+    </a>
+    <a
+      role="tab"
+      class="tab"
+      [class.tab-active]="container() === 'unread'"
+      (click)="selectContainer('unread')"
+    >
+      Unread
+      @if (container() === 'unread' && messages().length > 0) {
+        <div class="badge badge-error ml-2">{{ messages().length }}</div>
+      }
+    </a>
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="flex justify-center items-center py-20">
+      <span class="loading loading-spinner loading-lg"></span>
+    </div>
+  }
+
+  <!-- Message List -->
+  @if (!loading()) {
+    @if (messages().length > 0) {
+      <div class="space-y-2">
+        @for (message of messages(); track message.id) {
+          <div
+            (click)="openThread(message)"
+            class="card bg-base-100 shadow hover:shadow-lg transition-shadow cursor-pointer"
+            [class.border-2]="!message.dateRead && container() === 'inbox'"
+            [class.border-primary]="!message.dateRead && container() === 'inbox'"
+          >
+            <div class="card-body p-4">
+              <div class="flex items-center gap-4">
+                <!-- Avatar -->
+                <div class="avatar">
+                  <div class="w-12 h-12 rounded-full">
+                    <img
+                      [src]="(container() === 'outbox' ? message.recipientPhotoUrl : message.senderPhotoUrl) || 'https://via.placeholder.com/100'"
+                      [alt]="container() === 'outbox' ? message.recipientName : message.senderName"
+                    />
+                  </div>
+                </div>
+
+                <!-- Content -->
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between mb-1">
+                    <h3 class="font-semibold truncate">
+                      {{ container() === 'outbox' ? message.recipientName : message.senderName }}
+                    </h3>
+                    <span class="text-sm opacity-60">{{ getTimeAgo(message.dateSent) }}</span>
+                  </div>
+                  <p class="text-sm opacity-70 truncate">{{ message.content }}</p>
+                </div>
+
+                <!-- Unread indicator -->
+                @if (!message.dateRead && container() === 'inbox') {
+                  <div class="badge badge-primary">New</div>
+                }
+
+                <!-- Chevron -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <!-- Empty State -->
+      <div class="text-center py-20">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto mb-4 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+        </svg>
+
+        @if (container() === 'inbox') {
+          <p class="text-xl opacity-60 mb-4">No messages in your inbox</p>
+          <p class="opacity-40">When someone sends you a message, it will appear here</p>
+        }
+
+        @if (container() === 'outbox') {
+          <p class="text-xl opacity-60 mb-4">No sent messages</p>
+          <p class="opacity-40">Messages you send will appear here</p>
+        }
+
+        @if (container() === 'unread') {
+          <p class="text-xl opacity-60 mb-4">No unread messages</p>
+          <p class="opacity-40">You're all caught up!</p>
+        }
+      </div>
+    }
+  }
+</div>

@@ -1,1 +1,95 @@
-<p>lists works!</p>
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-8">Likes & Matches</h1>
+
+  <!-- Tabs -->
+  <div role="tablist" class="tabs tabs-boxed mb-8">
+    <a
+      role="tab"
+      class="tab"
+      [class.tab-active]="selectedTab() === 'liked'"
+      (click)="selectTab('liked')"
+    >
+      I've Liked
+    </a>
+    <a
+      role="tab"
+      class="tab"
+      [class.tab-active]="selectedTab() === 'likedBy'"
+      (click)="selectTab('likedBy')"
+    >
+      Liked Me
+    </a>
+    <a
+      role="tab"
+      class="tab"
+      [class.tab-active]="selectedTab() === 'mutual'"
+      (click)="selectTab('mutual')"
+    >
+      Matches
+      <div class="badge badge-secondary ml-2">{{ members().length }}</div>
+    </a>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="flex justify-center items-center py-20">
+      <span class="loading loading-spinner loading-lg"></span>
+    </div>
+  }
+
+  <!-- Member Grid -->
+  @if (!loading()) {
+    @if (members().length > 0) {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        @for (member of members(); track member.id) {
+          <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
+            <figure class="aspect-square">
+              <img
+                [src]="member.imageUrl || 'https://via.placeholder.com/400'"
+                [alt]="member.displayName"
+                class="object-cover w-full h-full"
+              />
+            </figure>
+            <div class="card-body">
+              <h2 class="card-title">{{ member.displayName }}</h2>
+              <p class="text-sm opacity-70">
+                <svg xmlns="http://www.w3.org/2000/svg" class="inline h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                {{ member.city }}, {{ member.country }}
+              </p>
+              <div class="card-actions justify-end mt-4">
+                <a [routerLink]="['/members', member.id]" class="btn btn-primary btn-sm">View Profile</a>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <!-- Empty State -->
+      <div class="text-center py-20">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto mb-4 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+
+        @if (selectedTab() === 'liked') {
+          <p class="text-xl opacity-60 mb-4">You haven't liked anyone yet</p>
+          <p class="opacity-40">Browse members and like someone to see them here</p>
+          <a routerLink="/members" class="btn btn-primary mt-6">Browse Members</a>
+        }
+
+        @if (selectedTab() === 'likedBy') {
+          <p class="text-xl opacity-60 mb-4">No one has liked you yet</p>
+          <p class="opacity-40">Keep your profile active and interesting!</p>
+        }
+
+        @if (selectedTab() === 'mutual') {
+          <p class="text-xl opacity-60 mb-4">No matches yet</p>
+          <p class="opacity-40">When you and another member like each other, you'll see them here</p>
+          <a routerLink="/members" class="btn btn-primary mt-6">Browse Members</a>
+        }
+      </div>
+    }
+  }
+</div>
