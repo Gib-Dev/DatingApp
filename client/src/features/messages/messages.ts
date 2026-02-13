@@ -1,6 +1,6 @@
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { MessageService } from '../../core/services/message-service';
 import { AccountService } from '../../core/services/account-service';
@@ -9,7 +9,7 @@ import { Message } from '../../types/message';
 @Component({
   selector: 'app-messages',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './messages.html',
   styleUrl: './messages.css'
 })

@@ -70,7 +70,7 @@
           placeholder="Type a message..."
           class="textarea textarea-bordered flex-1 resize-none"
           rows="1"
-          (keydown.enter)="$event.preventDefault(); !$event.shiftKey && sendMessage()"
+          (keydown.enter)="onEnterKey($event)"
         ></textarea>
         <button
           type="submit"

@@ -75,6 +75,14 @@ export class MessageThread implements OnInit, OnDestroy {
       });
   }
 
+  onEnterKey(event: Event): void {
+    event.preventDefault();
+    const keyboardEvent = event as KeyboardEvent;
+    if (!keyboardEvent.shiftKey) {
+      this.sendMessage();
+    }
+  }
+
   sendMessage(): void {
     if (this.messageForm.invalid) {
       this.messageForm.markAllAsTouched();
