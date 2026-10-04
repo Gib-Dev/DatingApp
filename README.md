@@ -1,260 +1,118 @@
 # DatingApp
 
-A full-stack dating application built with .NET 9 Web API backend and Angular 21 frontend.
+Full-stack social app with a **C# / ASP.NET Core (.NET 9) Web API** and an **Angular 21** front end: JWT authentication, member profiles with photo upload, likes and one-to-one messaging.
 
-## Project Overview
+**Case study:** https://magib.tech/projects/dating-app
 
-This is a modern dating application featuring user registration, authentication, and member management. The application uses a clean architecture with separate backend and frontend projects.
+> **Origin:** built by following Neil Cummings' ASP.NET Core and Angular course on Udemy, then reviewed and extended on my own (see [What I added](#what-i-added)). Status: **in progress** (5 of 7 planned phases done, not deployed yet).
 
-## Architecture
+## Why this project
 
-### Backend (.NET 9 Web API)
-
-- **Framework**: .NET 9.0
-- **Database**: SQLite with Entity Framework Core
-- **Authentication**: Custom password hashing with HMACSHA512
-- **CORS**: Configured for Angular development server
-
-### Frontend (Angular 21)
-
-- **Framework**: Angular 21 (next version)
-- **Styling**: Tailwind CSS with DaisyUI components
-- **Build Tool**: Angular CLI with zoneless change detection
-- **HTTP Client**: Built-in Angular HttpClient for API communication
+I wanted real experience with a typed back-end stack outside JavaScript (C#, ASP.NET Core, Entity Framework Core) and with Angular rather than React, on an application with authentication, relational data, file uploads and messaging.
 
 ## Features
 
-### Backend Features
+- **Accounts**: registration and login, JWT bearer tokens sent by an Angular HTTP interceptor, an auth guard and an error interceptor
+- **Members**: member list and profile pages, profile editing
+- **Photos**: upload (stored on the API server for now), set a main photo, delete photos
+- **Likes**: like a member, list likes
+- **Messages**: send a message, inbox, conversation thread, delete
 
-- User registration with email validation
-- User log in with secure password authentication
-- Member listing and individual member retrieval
-- SQLite database with Entity Framework Core migrations
-- CORS configuration for frontend integration
+## What I added
 
-### Frontend Features
+On top of the course material:
 
-- Modern UI with Tailwind CSS and DaisyUI
-- Member listing display
-- Responsive design
-- HTTPS support for development
+- **Password hashing**: replaced HMACSHA512 with **PBKDF2** (600,000 iterations, constant-time comparison) behind an `IPasswordService`
+- **Performance**: fixed an N+1 query when loading member photos
+- **Deployment readiness**: environment-based API configuration instead of hardcoded URLs
+- **Code review**: a written review of the codebase listing 34 issues (performance, security, architecture, code quality) that drives the next phases
+- **CI**: GitHub Actions build workflow and CodeQL analysis
 
-## Project Structure
+## Architecture
 
 ```
-DatingApp/
-├── API/                          # .NET 9 Web API Backend
-│   ├── Controllers/              # API Controllers
-│   │   ├── AccountController.cs  # Authentication endpoints
-│   │   ├── MembersController.cs  # Member management
-│   │   └── BaseApiController.cs  # Base controller
-│   ├── Data/                     # Data layer
-│   │   ├── AppDbContext.cs       # Entity Framework context
-│   │   ├── LoginDto.cs           # Login data transfer object
-│   │   └── Migrations/           # Database migrations
-│   ├── DTOs/                     # Data transfer objects
-│   │   └── RegistrerDto.cs       # Registration DTO (filename may be corrected to RegisterDto.cs)
-│   ├── Entities/                 # Domain entities
-│   │   └── AppUser.cs            # User entity
-│   ├── dating.db                 # SQLite database
-│   └── Program.cs                # Application entry point
-├── client/                       # Angular 21 Frontend
-│   ├── src/
-│   │   ├── app/                  # Angular application
-│   │   │   ├── app.ts            # Main component
-│   │   │   ├── app.html          # Main template
-│   │   │   ├── app.css           # Component styles
-│   │   │   ├── app.routes.ts     # Routing configuration
-│   │   │   └── app.config.ts     # Application configuration
-│   │   ├── styles.css            # Global styles
-│   │   └── main.ts               # Application bootstrap
-│   ├── public/                   # Static assets
-│   └── ssl/                      # SSL certificates for development
-└── DatingApp.sln                 # Visual Studio solution file
+Angular 21 (zoneless, Tailwind CSS + DaisyUI)
+  core/        guards, HTTP interceptors (JWT, errors), services
+  features/    account, members, lists, messages
+        │  HTTPS + JWT
+        ▼
+ASP.NET Core Web API (.NET 9)
+  Controllers ── DTOs ── Services (token, password)
+  Exception middleware (consistent error responses)
+        │
+        ▼
+Entity Framework Core ── SQLite (code-first migrations)
+Photo files ── API server storage (wwwroot/images)
 ```
 
-## Getting Started
+### API endpoints
 
-### Prerequisites
+| Method | Route | Auth | Purpose |
+| --- | --- | --- | --- |
+| POST | `/api/account/register` | | Create an account |
+| POST | `/api/account/login` | | Get a JWT |
+| GET | `/api/members` | | List members |
+| GET | `/api/members/{id}` | ✓ | Member profile |
+| PUT | `/api/members` | ✓ | Update own profile |
+| POST | `/api/members/add-photo` | ✓ | Upload a photo |
+| PUT | `/api/members/set-main-photo/{photoId}` | ✓ | Set main photo |
+| DELETE | `/api/members/delete-photo/{photoId}` | ✓ | Delete a photo |
+| POST | `/api/likes/{likedUserId}` | ✓ | Like a member |
+| GET | `/api/likes` | ✓ | List likes |
+| POST | `/api/messages` | ✓ | Send a message |
+| GET | `/api/messages` | ✓ | Inbox |
+| GET | `/api/messages/thread/{userId}` | ✓ | Conversation thread |
+| DELETE | `/api/messages/{id}` | ✓ | Delete a message |
 
-- .NET 9 SDK
-- Node.js (v18 or higher)
-- Angular CLI (v21)
-- EF Core CLI tool (for migrations):
-  ```bash
-  dotnet tool install --global dotnet-ef
-  ```
+### Data model
 
-### Backend Setup
+Entity Framework Core entities: `AppUser`, `Member`, `Photo`, `UserLike` (self-referencing many-to-many between members) and `Message`.
 
-1. Navigate to the API directory:
+## Tech stack
 
-   ```bash
-   cd API
-   ```
+**Back end:** C#, .NET 9, ASP.NET Core Web API, Entity Framework Core 9, SQLite, JWT bearer authentication
+**Front end:** Angular 21 (zoneless change detection), TypeScript, Tailwind CSS 4, DaisyUI
+**Tooling:** GitHub Actions, CodeQL
 
-2. Restore dependencies:
+## Getting started
 
-   ```bash
-   dotnet restore
-   ```
+Requires the .NET 9 SDK, Node.js 18+, the Angular CLI and the EF Core tools (`dotnet tool install --global dotnet-ef`).
 
-3. Update the database:
+### API
 
-   ```bash
-   dotnet ef database update
-   ```
+```bash
+cd API
+cp appsettings.Development.example.json appsettings.Development.json   # set your own TokenKey
+dotnet restore
+dotnet ef database update
+dotnet run          # https://localhost:5001
+```
 
-4. Run the API:
-   ```bash
-   dotnet run
-   ```
+`appsettings.Development.json` is git-ignored: keep real keys out of the repository.
 
-The API will be available at `https://localhost:5001`.
+### Client
 
-### Frontend Setup
+```bash
+cd client
+npm install
+npm start           # https://localhost:4200
+```
 
-1. Navigate to the client directory:
+## Known limitations
 
-   ```bash
-   cd client
-   ```
+- No automated tests yet (planned for the quality phase)
+- Not deployed yet
+- Photos are stored on the API server; cloud storage is not wired up yet
+- Open items from the code review: missing database indexes, CORS too permissive for production, business logic still in some controllers
 
-2. Install dependencies:
+## Next steps
 
-   ```bash
-   npm install
-   ```
-
-3. Run the development server:
-   ```bash
-   npm start
-   ```
-
-The application will be available at `https://localhost:4200`.
-
-## API Endpoints
-
-### Authentication
-
-- `POST /api/account/register` - Register a new user
-- `POST /api/account/login` - Log in user
-
-### Members
-
-- `GET /api/members` - Get all members
-- `GET /api/members/{id}` - Get member by ID
-
-## Database Schema
-
-### AppUser Entity
-
-- `Id` (string) - Unique identifier
-- `DisplayName` (string) - User's display name
-- `Email` (string) - User's email address
-- `PasswordHash` (byte[]) - Hashed password
-- `PasswordSalt` (byte[]) - Password salt for hashing
-
-## Development Notes
-
-- The application uses SQLite for the development database
-- Password hashing is implemented using HMACSHA512
-- CORS is configured to allow requests from Angular development server
-- The frontend uses Tailwind CSS with DaisyUI for styling
-- SSL certificates are included for HTTPS development
-
-## Security Notes
-
-- Secrets: never commit real secrets. Keep `appsettings.Development.json` local; use `appsettings.Development.example.json` as a template.
-- JWT signing key: store securely via environment variables or a secrets provider in production.
-- Password hashing: for production, prefer PBKDF2, bcrypt, scrypt, or Argon2 instead of raw HMACSHA512.
-- CORS: restrict origins, headers, and methods in production.
-- HTTPS: enforce HTTPS redirection and enable HSTS in production.
-- Rate limiting: apply on authentication endpoints to mitigate brute-force attacks.
-
-## Technologies Used
-
-### Backend
-
-- .NET 9.0
-- Entity Framework Core 9.0.8
-- SQLite
-- ASP.NET Core Web API
-
-### Frontend
-
-- Angular 21.0.0-next.0
-- Tailwind CSS 4.1.12
-- DaisyUI 5.0.54
-- TypeScript 5.9.2
+- Database indexes and stricter CORS
+- Repository pattern to move logic out of controllers
+- Unit tests for the API
+- Cloud photo storage (Cloudinary)
+- Deployment
 
 ## License
 
-This project is for educational purposes.
-
-## Demo
-
-- Live demo: add link here when deployed
-- API base URL (local): `https://localhost:5001`
-- Client URL (local): `https://localhost:4200`
-
-## Screenshots
-
-Place screenshots in `client/public/` and reference them here:
-
-- Landing page: `client/public/landing.png`
-- Members list: `client/public/members.png`
-- Messaging: `client/public/messages.png`
-
-## Environment Configuration
-
-- Backend (`API/appsettings.Development.json`): set connection strings and JWT config.
-- Frontend (`client/src/app`): update API base URL used by the HTTP client if applicable.
-- Secrets: never commit real secrets. Use user secrets or environment variables for production.
-
-## Development Workflow
-
-1. Start API: `cd API && dotnet run`
-2. Start Client: `cd client && npm start`
-3. Browse client at `https://localhost:4200` (API must be running for data).
-
-### Common Tasks
-
-- Run Angular unit tests: `cd client && npm test`
-- Add EF Core migration: `cd API && dotnet ef migrations add <Name>`
-- Update database: `cd API && dotnet ef database update`
-
-## Testing
-
-- Backend: add unit tests for services (e.g., token issuance) and controller actions; consider integration tests against a test database.
-- Frontend: run unit tests with `npm test` and consider end-to-end tests for critical flows.
-
-## Deployment
-
-### API (Azure App Service)
-
-- Publish profile from Visual Studio or `dotnet publish -c Release` and deploy artifact.
-- Set environment variables (e.g., connection strings, JWT options) in Azure.
-
-### Client (Static Hosting)
-
-- Build: `cd client && npm run build` (outputs to `client/dist`).
-- Deploy `dist` output to a static host (Azure Static Web Apps, Netlify, Vercel, S3+CloudFront).
-- Ensure the client points to the public API URL.
-
-## Configuration and Environments
-
-- Backend configuration lives in `API/appsettings*.json`. Use environment variables or managed secrets in production.
-- Frontend should reference the API base URL from environment configuration and avoid hardcoding URLs.
-
-## Roadmap
-
-- Photo upload and gallery
-- Private messaging
-- Filtering, sorting, and paging
-- JWT authentication and guards
-- Real-time presence and notifications with SignalR
-
-## License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+Educational project based on course material.
